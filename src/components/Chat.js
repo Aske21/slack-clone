@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import ChatInput from "./ChatInput";
 
@@ -13,11 +13,15 @@ import { db } from "../firebase";
 import Message from "./Message";
 
 function Chat() {
+  const chatRef = useRef(null);
+
   const roomId = useSelector(selectRoomId);
+
   const [roomDetails] = useCollection(
     roomId && db.collection("rooms").doc(roomId)
   );
-  const [roomMessage] = useCollection(
+
+  const [roomMessage, loading] = useCollection(
     roomId &&
       db
         .collection("rooms")
@@ -25,6 +29,10 @@ function Chat() {
         .collection("messages")
         .orderBy("timestamp", "asc")
   );
+
+  useEffect(() => {
+    chatRef?.current?.scrollIntoView({ behavior: "smooth" });
+  }, [roomId, loading]);
 
   return (
     <ChatContainer>
@@ -55,8 +63,13 @@ function Chat() {
               />
             );
           })}
+          <ChatBottom ref={chatRef} />
         </ChatMessages>
-        <ChatInput channelId={roomId} channelName={roomDetails?.data().name} />
+        <ChatInput
+          chatRef={chatRef}
+          channelId={roomId}
+          channelName={roomDetails?.data().name}
+        />
       </>
     </ChatContainer>
   );
@@ -107,3 +120,7 @@ const HeaderRight = styled.div`
 `;
 
 const ChatMessages = styled.div``;
+
+const ChatBottom = styled.div`
+  padding-bottom: 200px;
+`;

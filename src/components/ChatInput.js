@@ -1,11 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import { Button } from "@material-ui/core";
 import { db } from "../firebase.js";
 import firebase from "firebase";
 
-function ChatInput({ channelName, channelId }) {
+function ChatInput({ channelName, channelId, chatRef }) {
   const [input, setInput] = useState("");
 
   const sendMessage = (e) => {
@@ -22,6 +22,12 @@ function ChatInput({ channelName, channelId }) {
       img: "https://cdn-icons-png.flaticon.com/512/147/147144.png",
     });
 
+    // scroll back down
+    chatRef.current.scrollIntoView({
+      behavior: "smooth",
+    });
+
+    // clear after sending message
     setInput("");
   };
   return (
